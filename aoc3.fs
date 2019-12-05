@@ -51,8 +51,9 @@ let step dirn pos =
 
 let processCmd pos cmd =
     let zzz = 
-        [0..cmd.amount]
+        [0..cmd.amount-1]
         |> List.scan (fun state _ -> step cmd.direction state ) pos
+        |> List.tail
     zzz
 
 let rec coords pos line  = 
@@ -66,19 +67,45 @@ let rec coords pos line  =
 
 
 
-let line1 = coords {x=0; y=0} inputs.[0] |> List.filter (fun x -> x <> {x=0;y=0})
-let line2 = coords {x=0; y=0} inputs.[1] |> List.filter (fun x -> x <> {x=0;y=0})
+let line n = coords {x=0; y=0} inputs.[n] //|> List.filter (fun x -> x <> {x=0;y=0})
 
-let intersections = 
-    let set1 = line1 |> Set.ofList
-    let set2 = line2 |> Set.ofList
+let intersections set1 set2 = 
     set1 
     |> Set.intersect set2
     |> Set.map (fun v -> {|x=v.x; y=v.y; dist=Math.Abs(v.x+v.y) |})
 
-let minDistance =
-    intersections
+let print ints = 
+    ints 
+    |> Set.iter (printfn "%A")
+
+let printC coords = 
+    coords 
+    |> List.map (sprintf "%O")
+    |> List.toArray
+    |> fun x -> String.Join("\n", x)
+
+
+let minDistance line1 line2=
+    let set1 = line line1 |> Set.ofList
+    let set2 = line line2 |> Set.ofList
+    intersections set1 set2
     |> Set.toList
     |> List.map (fun x -> x.dist)
     |> List.min
 
+let minPath index1 index2 = 
+    let line1 = line index1 
+    let line2 = line index2 
+    let intersects = intersections (line1 |> Set.ofList) (line2 |> Set.ofList)
+    intersects
+    |> Set.toList
+    |> List.map (fun i -> 
+        {|
+            x=i.x
+            y=i.y
+            step1=(line1 |> List.findIndex (fun c -> c.x=i.x && c.y=i.y)) + 1
+            step2=(line2 |> List.findIndex (fun c -> c.x=i.x && c.y=i.y)) + 1
+        |}
+    )
+    |> List.map ( fun x -> x.step1 + x.step2)
+    |> List.min
