@@ -56,4 +56,14 @@ let ``AOC4b`` () =
 
 [<Fact>]
 let ``AOC5a`` () =    
-    Assert.Equal(42, AOC5.test1())
+    Assert.Equal(42, AOC5.test1 42)
+    Assert.Equal(1, AOC5.test1 1)
+    Assert.Equal(987654, AOC5.test1 987654)
+
+[<Fact>]
+let ``AOC5a modes`` () =    
+    Assert.Equal(99, AOC5.testModes())
+
+[<Fact>]
+let ``AOC5a diagnostic`` () =    
+    Assert.Equal(15508323, AOC5.runDiagnosticA())

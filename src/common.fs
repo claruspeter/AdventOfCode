@@ -11,3 +11,5 @@ let parseInts x =
 
 
 let raw n = File.ReadAllText(sprintf "../../../../data/aoc%d_input.txt" n)
+
+        
