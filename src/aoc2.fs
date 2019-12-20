@@ -35,48 +35,60 @@ type IntParams = {
     parameters: ParaValue list
 }
 
-type CmdProcessor = int[] -> IntParams -> int[]
+type IntMachine = {
+    data: int[]
+    inputs: int list
+    outputs: int list
+}  
+
+type CmdProcessor = IntMachine -> IntParams -> IntMachine
 type Cmd = {
     processor: CmdProcessor
     numberOfParameters: int
 }
 
+let fromData ints = {data=ints; inputs=[]; outputs=[]}
+
+let compareData data intMc = 
+    intMc.data 
+    |> Array.compareWith (fun a b -> a.CompareTo b) data
+
 
 let processCmd1 ints paras = 
-    let result = ints |> Array.copy
+    let result = ints.data |> Array.copy
     result.[paras.destination] <- paras.parameters.[0].valueAtPosition + paras.parameters.[1].valueAtPosition
-    result
+    result |> fromData
 
 let processCmd2 ints paras = 
-    let result = ints |> Array.copy
+    let result = ints.data |> Array.copy
     result.[paras.destination] <- paras.parameters.[0].valueAtPosition * paras.parameters.[1].valueAtPosition
-    result
+    result |> fromData
 
 let TwoCommands = [
     { processor = processCmd1; numberOfParameters=2 }
     { processor = processCmd2; numberOfParameters=2 }
 ]
 
-let rec processIntMachine (commandProcessors: Cmd list) position (ints: int [])  =
-    let cmdIndex = ints.[position]
-    printfn "CMD %i at %i" cmdIndex position
+let rec processIntMachine (commandProcessors: Cmd list) position (ints: IntMachine)  =
+    let cmdIndex = ints.data.[position]
+    // printfn "CMD %i at %i" cmdIndex position
     if cmdIndex = 99 then 
         ints
     else
         let cmd = commandProcessors.[cmdIndex - 1]
-        printfn "-paras: %i" cmd.numberOfParameters
+        // printfn "-paras: %i" cmd.numberOfParameters
         let paraValues = 
             [1..cmd.numberOfParameters]
             |> List.map ( fun x -> 
-                let v = ints.[x + position]
+                let v = ints.data.[x + position]
                 {
                     value=v; 
-                    valueAtPosition=ints.[v]
+                    valueAtPosition=ints.data.[v]
                 }
             )
-        paraValues |> List.iteri (fun i x -> printfn "--para: %i=%O" (i + position) x)
+        // paraValues |> List.iteri (fun i x -> printfn "--para: %i=%O" (i + position) x)
         let paras = {
-            destination = ints.[position + cmd.numberOfParameters + 1 ]
+            destination = ints.data.[position + cmd.numberOfParameters + 1 ]
             parameters = paraValues
         }
         let result = cmd.processor ints paras
@@ -84,30 +96,35 @@ let rec processIntMachine (commandProcessors: Cmd list) position (ints: int []) 
 
 let test1() = 
     [|1;0;0;0;99|]
+    |> fromData
     |> processIntMachine TwoCommands 0
-    |> Array.compareWith (fun a b -> a.CompareTo b) [|2;0;0;0;99|]
+    |> compareData [|2;0;0;0;99|]
 
 let test2() = 
     [|2;3;0;3;99|]
+    |> fromData
     |> processIntMachine TwoCommands 0
-    |> Array.compareWith (fun a b -> a.CompareTo b) [|2;3;0;6;99|]
+    |> compareData [|2;3;0;6;99|]
 
 let test3() = 
     [|2;4;4;5;99;0|]
+    |> fromData
     |> processIntMachine TwoCommands 0
-    |> Array.compareWith (fun a b -> a.CompareTo b) [|2;4;4;5;99;9801|]
+    |> compareData [|2;4;4;5;99;9801|]
 
 let test4() = 
     [|1;1;1;4;99;5;6;0;99|]
+    |> fromData
     |> processIntMachine TwoCommands 0
-    |> Array.compareWith (fun a b -> a.CompareTo b) [|30;1;1;4;2;5;6;0;99|]
+    |> compareData [|30;1;1;4;2;5;6;0;99|]
 
 let generate1202Error() = 
     inputs()
     |> doctor 12 02
+    |> fromData
     |> processIntMachine TwoCommands 0
-    |> printProgram
-    |> ignore
+    // |> printProgram
+    |> fun x -> x.data.[0]
 
 let target = 19690720
 
@@ -118,8 +135,9 @@ let findTarget() =
                 let result = 
                     inputs()
                     |> doctor noun verb
+                    |> fromData
                     |> processIntMachine TwoCommands 0
-                    |> (fun x -> x.[0])
+                    |> (fun x -> x.data.[0])
                 yield {| noun=noun; verb=verb; result=result; success=(result = target)|}
         ]
     run

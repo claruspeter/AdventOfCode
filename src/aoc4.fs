@@ -18,7 +18,11 @@ let isAlwaysIncreasing (pwd: char[]) =
 let toPwd (x:int) =
     x.ToString().ToCharArray()
 
-let passesTests pwd =
+let passesTestsA pwd =
+    hasDoubleAdjacent pwd
+    && isAlwaysIncreasing pwd
+
+let passesTestsB pwd =
     hasUniqueDoubleAdjacent pwd
     && isAlwaysIncreasing pwd
 
@@ -28,8 +32,13 @@ let TEST_END = 846303
 let partA = 
     seq [TEST_START..TEST_END]
     |> Seq.map toPwd
-    |> Seq.filter passesTests
+    |> Seq.filter passesTestsA
     |> Seq.length
 
+let partB = 
+    seq [TEST_START..TEST_END]
+    |> Seq.map toPwd
+    |> Seq.filter passesTestsB
+    |> Seq.length
 
 

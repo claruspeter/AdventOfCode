@@ -17,7 +17,7 @@ let rec additional input =
         0
     else
         let result = fuel + additional fuel
-        printfn "-- %d " result
+        // printfn "-- %d " result
         result
 
 let data = 

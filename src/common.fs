@@ -10,4 +10,4 @@ let parseInts x =
     | _ -> None
 
 
-let raw n = File.ReadAllText(sprintf "data/aoc%d_input.txt" n)
+let raw n = File.ReadAllText(sprintf "../../../../data/aoc%d_input.txt" n)
