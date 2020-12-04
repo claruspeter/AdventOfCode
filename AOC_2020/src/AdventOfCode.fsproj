@@ -7,10 +7,12 @@
   <ItemGroup>
     <Compile Include="common.fs" />
     <Compile Include="aoc1.fs" />
+    <Compile Include="aoc2.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FSharp.Data" Version="3.3.2" />
+    <PackageReference Include="FSharp.Scanf" Version="4.0.0" />
   </ItemGroup>
 
 </Project>
