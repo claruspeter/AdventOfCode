@@ -1,14 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
     <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Tests.fs" />
+    <Compile Include="Test1.fs" />
+    <Compile Include="Test2.fs" />
+    <Compile Include="Test3.fs" />
+    <Compile Include="Test4.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

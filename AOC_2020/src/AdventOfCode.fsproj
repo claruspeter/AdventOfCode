@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -9,6 +9,7 @@
     <Compile Include="aoc1.fs" />
     <Compile Include="aoc2.fs" />
     <Compile Include="aoc3.fs" />
+    <Compile Include="aoc4.fs" />
   </ItemGroup>
 
   <ItemGroup>

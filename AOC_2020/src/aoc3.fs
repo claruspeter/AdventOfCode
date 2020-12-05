@@ -11,8 +11,7 @@ type PosResponse =
   | Done
 
 let inputs = 
-    raw 3
-    |> fun s -> s.Split([|'\r'; '\n'|], StringSplitOptions.RemoveEmptyEntries)
+    lines 3
 
 let isTree pos =
   if pos.y >= inputs.Length then 
