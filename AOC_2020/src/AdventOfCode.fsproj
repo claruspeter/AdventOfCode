@@ -11,6 +11,7 @@
     <Compile Include="aoc3.fs" />
     <Compile Include="aoc4.fs" />
     <Compile Include="aoc5.fs" />
+    <Compile Include="aoc6.fs" />
   </ItemGroup>
 
   <ItemGroup>

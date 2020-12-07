@@ -17,6 +17,9 @@ let raw n = File.ReadAllText(sprintf "../../../../data/aoc%d_input.txt" n)
 
 let lines n = File.ReadAllLines(sprintf "../../../../data/aoc%d_input.txt" n)
 
+let toMultiLineBlocks (s:string) =
+  let spaced = s.Replace("\n", " ");
+  spaced.Split([|"  "|], StringSplitOptions.RemoveEmptyEntries)
         
 [<Measure>] type cm  
 [<Measure>] type inch

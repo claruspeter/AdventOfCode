@@ -8,9 +8,8 @@ open System.Text.RegularExpressions
 
 
 let inputs = 
-    let s = raw 4
-    let spaced = s.Replace("\n", " ");
-    spaced.Split([|"  "|], StringSplitOptions.RemoveEmptyEntries);
+  raw 4 
+  |> toMultiLineBlocks
 
 let n = inputs.Length
 
