@@ -13,6 +13,7 @@ let n = inputs.Length
 
 type BagPair = {
   inside: string
+  count: int
   outside: string
 }
 
@@ -27,7 +28,7 @@ let parseBag s =
   contents.Split(',', StringSplitOptions.TrimEntries )
     |> Array.toList
     |> List.choose parseBagContents
-    |> List.map (fun inBag -> {BagPair.outside = name; inside = (snd inBag)})
+    |> List.map (fun inBag -> {BagPair.outside = name; inside = snd inBag; count = fst inBag})
 
 let parseBags lines = 
   lines
@@ -50,3 +51,19 @@ let containedWithin bagPairs innerBagName =
   containedWithinBag bagPairs innerBagName
   |> List.sort
   |> Set
+
+let rec countInBag bagPairs outerBagName =
+  let children =
+    bagPairs
+    |> List.filter (fun b -> b.outside = outerBagName)
+  let childrenCount = 
+    children
+    |> List.sumBy (fun b -> b.count)
+  let grandChildrenCount = 
+    children
+    |> List.sumBy (fun b -> b.count * (countInBag bagPairs b.inside))
+  childrenCount + grandChildrenCount
+  
+
+
+
