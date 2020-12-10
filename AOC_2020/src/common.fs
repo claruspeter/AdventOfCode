@@ -55,9 +55,6 @@ let pretty result =
     | Ok _ -> "OK"
     | Error s -> sprintf "ERROR: %s" s
 
-// let (>=>) f g = f >> (bind g)
-// let (>==>) f g = f >> (Option.bind g)
-
 let (>=>) f g x =
   match f x with 
   | Ok y -> g y
