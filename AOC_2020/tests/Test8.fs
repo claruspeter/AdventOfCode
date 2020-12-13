@@ -19,9 +19,6 @@ module Test8 =
     jmp -4
     acc +6"
 
-  let preProcess (block:string) =
-    block.Split('\n', StringSplitOptions.TrimEntries) 
-    |> Array.toList
 
   let ErrorValue (err:Result<_,_>) =
     match err with 

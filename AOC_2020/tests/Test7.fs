@@ -29,10 +29,6 @@ module Test7 =
     dark blue bags contain 2 dark violet bags.
     dark violet bags contain no other bags."
 
-  let preProcess (block:string) =
-    block.Split('\n', StringSplitOptions.TrimEntries) 
-    |> Array.toList
-
   [<Fact>]
   let ``prevalidate 7a parsing`` () =
     Assert.Equal(594, n)

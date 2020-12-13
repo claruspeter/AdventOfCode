@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <Compile Include="common.fs" />
+    <Compile Include="pairs.fs" />
     <Compile Include="aoc1.fs" />
     <Compile Include="aoc2.fs" />
     <Compile Include="aoc3.fs" />
@@ -14,6 +15,7 @@
     <Compile Include="aoc6.fs" />
     <Compile Include="aoc7.fs" />
     <Compile Include="aoc8.fs" />
+    <Compile Include="aoc9.fs" />
   </ItemGroup>
 
   <ItemGroup>

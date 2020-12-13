@@ -20,6 +20,11 @@ let lines n = File.ReadAllLines(sprintf "../../../../data/aoc%d_input.txt" n)
 let toMultiLineBlocks (s:string) =
   let spaced = s.Replace("\n", " ");
   spaced.Split([|"  "|], StringSplitOptions.RemoveEmptyEntries)
+
+
+let preProcess (block:string) =
+  block.Split('\n', StringSplitOptions.TrimEntries) 
+  |> Array.toList
         
 [<Measure>] type cm  
 [<Measure>] type inch
