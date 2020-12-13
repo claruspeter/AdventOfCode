@@ -3,3 +3,6 @@
 
 2019:
 	cd AOC_2019/tests; dotnet watch test
+
+day: 
+	./day.sh
