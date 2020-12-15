@@ -8,6 +8,22 @@ open AOC_Common
 
 module Test10 =
   open AOC10
+  
+  let smallSample =
+    "16
+    10
+    15
+    5
+    1
+    11
+    7
+    19
+    6
+    12
+    4"
+    |> preProcess
+    |> List.choose parseInts
+
   let sample = 
     "28
     33
@@ -59,4 +75,11 @@ module Test10 =
     Assert.Equal(40, steps |> List.filter (fun x -> x = 3) |> List.length)
     Assert.Equal(3000, 75 * 40)
 
+  [<Fact>]
+  let ``prevalidate 10b`` () =
+    Assert.Equal(8L, smallSample |> countCombos)
+    Assert.Equal(19208L, sample |> countCombos)
 
+  [<Fact>]
+  let ``Count combinations`` () =
+    Assert.Equal(193434623148032L, inputs |> countCombos)
