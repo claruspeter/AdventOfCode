@@ -39,3 +39,7 @@ let logseq seq =
   seq
   |> Seq.iter (fun x -> printfn "%A" x)
   seq
+
+let log x =
+  printfn "%A" x
+  x

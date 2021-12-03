@@ -1,14 +1,14 @@
-module Test0
+module Tests.Day0
 
 open System
-open System.Linq
 open Xunit
+open FsUnit.Xunit
 open AOC2021.Common
 open AOC2021.Day0
 
 [<Fact>]
 let A_Sample () =
-  3 |> should equal 2
+  ()
 
 
 

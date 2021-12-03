@@ -1,4 +1,4 @@
-module Tests2
+module Tests.Day2
 
 open System
 open Xunit
