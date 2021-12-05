@@ -126,4 +126,4 @@ let rec callTillLastBingo (boards: BingoBoard list) (calls: int seq) =
 
 let filterBingo (predicate: BingoCell -> bool ) (board: BingoBoard) =
   board.cells
-  |> Array.collect (Array.filter predicate)
+  |> filterDoubleArray predicate

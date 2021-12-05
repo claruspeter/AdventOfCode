@@ -2,6 +2,7 @@ module AOC2021.Common
 
 open System 
 open System.IO
+open System.Text.RegularExpressions
 open Microsoft.FSharp.Core.Result
 
 let parseInts x = 
@@ -49,3 +50,14 @@ let logseqf (transform: 'a -> 'b) seq =
   |> Seq.map transform
   |> Seq.iter (log >> ignore)
   seq
+
+let filterDoubleArray<'T> (predicate: 'T -> bool ) (board: 'T array array) =
+  board
+  |> Array.collect (Array.filter predicate)
+
+let (|Regex|_|) pattern input =
+    if input = null then None
+    else
+        let m = Regex.Match(input, pattern, RegexOptions.Compiled)
+        if m.Success then Some [for x in m.Groups -> x.Value]
+        else None
