@@ -29,6 +29,15 @@ let sample =
     " 2  0 12  3  7"
   ]
 
+let uncalled (bingo: BingoResult option) = 
+    bingo.Value.board 
+    |> Seq.map (fun b -> 
+      b
+      |> filterBingo (fun cell -> not cell.isCalled)
+      |> Array.sumBy (fun x -> x.value)
+    )
+    |> Seq.toArray
+
 [<Fact>]
 let A_Sample () =
   let data = sample |> Seq.toList
@@ -37,14 +46,10 @@ let A_Sample () =
   boards |> Seq.length |> should equal 3
 
   let bingo = callTillBingo boards caller
-  let uncalled = 
-    bingo.board 
-    |> filterBingo (fun cell -> not cell.isCalled)
-    |> Array.sumBy (fun x -> x.value)
-  uncalled |> should equal 188
+  bingo |> uncalled |> should equal [| 188 |]
 
 
-[<Fact>]
+// [<Fact>]
 let A () =
   let data = lines 4 |> Seq.toList
   let caller = data.[0].Split([|','|]) |> Array.map Int32.Parse
@@ -52,9 +57,31 @@ let A () =
   boards |> Seq.length |> should equal 100
 
   let bingo = callTillBingo boards caller
-  let uncalled = 
-    bingo.board 
-    |> filterBingo (fun cell -> not cell.isCalled)
-    |> Array.sumBy (fun x -> x.value)
-  uncalled |> should equal 1137
-  uncalled * bingo.called |> should equal 5685
+  bingo |> uncalled |> should equal [| 1137 |]
+  bingo |> uncalled |> Array.head |>  (*) bingo.Value.lastCalled |> should equal 5685
+
+[<Fact>]
+let B_Sample () =
+  let data = sample |> Seq.toList
+  let caller = data.[0].Split([|','|]) |> Array.map Int32.Parse
+  let boards = data |> List.skip 1 |> parseBoards |> Seq.toList
+  boards.Length |> should equal 3
+
+  let bingo = callTillLastBingo boards caller
+  bingo.Value.lastCalled |> should equal 13
+  bingo |> uncalled |> should equal [| 148 |]
+
+[<Fact>]
+let B () =
+  let data = lines 4 |> Seq.toList
+  let caller = data.[0].Split([|','|]) |> Array.map Int32.Parse
+  let boards = data |> List.skip 1 |> parseBoards |> Seq.toList
+  boards.Length |> should equal 100
+
+  let bingo = callTillLastBingo boards caller
+  bingo |> uncalled |> should equal [| 430 |]
+  bingo 
+  |> uncalled 
+  |> Array.head 
+  |>  (*) bingo.Value.lastCalled 
+  |> should equal 21070

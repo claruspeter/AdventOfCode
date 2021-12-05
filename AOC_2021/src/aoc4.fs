@@ -8,9 +8,12 @@ type BingoCell = {
   isCalled: bool
 }
 
-type BingoBoard =  BingoCell[][]
+type BingoBoard = {
+  id: int
+  cells: BingoCell[][]
+}
 
-let parseBoard (boardLines: string[]) : BingoBoard=
+let parseBoard (i:int) (boardLines: string[]) : BingoBoard=
   boardLines
     |> Array.skip 1
     |> Array.map (fun line -> 
@@ -18,11 +21,12 @@ let parseBoard (boardLines: string[]) : BingoBoard=
       |> Array.map Int32.Parse
       |> Array.map (fun x -> {value=x; isCalled=false})
       )
+    |> fun x -> {id=i; cells = x}
 
 let parseBoards (lines: string seq) = 
   lines
   |> Seq.chunkBySize 6
-  |> Seq.map parseBoard
+  |> Seq.mapi parseBoard
 
 let printCell cell =
   if cell.isCalled then
@@ -31,7 +35,7 @@ let printCell cell =
     sprintf " %2d " cell.value
 
 let printBoard board : string =
-  board 
+  board.cells
   |> Seq.map (fun row -> 
       row
       |> Array.map printCell
@@ -41,13 +45,14 @@ let printBoard board : string =
   |> fun s -> String.Join("\r\n", s)
 
 let call x board :BingoBoard =
-  board
+  board.cells
   |> Array.map (fun row ->
     row
     |> Array.map (fun cell -> 
       {cell with isCalled = if cell.value = x then true else cell.isCalled}
     )
   )
+  |> fun x -> {id=board.id; cells=x}
 
 let numCalled (line:BingoCell[]) =
   line
@@ -56,34 +61,69 @@ let numCalled (line:BingoCell[]) =
 
 let maxCalled (board:BingoBoard) =
   let byRow = 
-    board
+    board.cells
     |> Array.map numCalled
     |> Array.max
   let byCol = 
-    board
+    board.cells
     |> Array.transpose
     |> Array.map numCalled
     |> Array.max
   [byRow; byCol] |> Seq.max
 
+type BingoResult = {
+    board: BingoBoard seq
+    lastCalled: int
+    remainingCalls: int seq
+    remainingBoards: BingoBoard list
+  }
+
+
 let rec callTillBingo (boards: BingoBoard seq) (calls: int seq) =
-  let n = calls |> Seq.head
-  // printfn "CALL = %d" n
-  let updated =
-    boards
-    |> Seq.map (call n)
-  let maxed = 
-    updated
-    |> Seq.map (fun b -> (maxCalled b, b))
-    |> Seq.sortByDescending fst
-    // |> logseqf (fun x -> 
-    //       (x |> fst |> sprintf "%d:\r\n") + (x |> snd |> printBoard)
-    //   )
-  if (maxed |> Seq.head |> fst) < 5 then 
-    callTillBingo updated (calls |> Seq.tail)
+  if calls |> Seq.isEmpty || boards |> Seq.isEmpty then 
+    // printfn "No calls."
+    None
   else
-    {| board = maxed |> Seq.head |> snd; called = n |}
+    let n = calls |> Seq.head
+    // printfn "call %d" n
+    let remainingCalls = (calls |> Seq.tail)
+    let updated =
+      boards
+      |> Seq.map (call n)
+    let winners = 
+      updated
+      |> Seq.map (fun b -> (maxCalled b, b))
+      |> Seq.filter (fun (n, b) -> n >= 5 )
+      |> Seq.map snd
+    if (winners |> Seq.isEmpty ) then 
+      if remainingCalls |> Seq.isEmpty then 
+        // printfn "No more calls remaining."
+        None
+      else
+        callTillBingo updated remainingCalls
+    else
+      let winningIds = winners |> Seq.map (fun b -> b.id)
+      let remaining = updated |> Seq.filter ( fun b -> winningIds |> Seq.contains b.id |> not)
+      // printfn " !! BINGO: %A !!" winningIds
+      {
+        board = winners
+        lastCalled = n
+        remainingCalls = remainingCalls 
+        remainingBoards = remaining |> Seq.toList
+      }
+      |> Some
+
+let rec callTillLastBingo (boards: BingoBoard list) (calls: int seq) =
+  match callTillBingo boards calls with 
+  | None -> None
+  | Some result ->
+    if boards.Length = 1 then
+      Some result
+    else
+      callTillLastBingo result.remainingBoards  result.remainingCalls
+      |> Option.orElse (Some result)
+
 
 let filterBingo (predicate: BingoCell -> bool ) (board: BingoBoard) =
-  board
+  board.cells
   |> Array.collect (Array.filter predicate)
