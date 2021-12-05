@@ -35,11 +35,17 @@ let (>==>) f g x =
   | Some y -> Some y
   | None -> g x
 
-let logseq seq =
-  seq
-  |> Seq.iter (fun x -> printfn "%A" x)
-  seq
 
 let log x =
   printfn "%A" x
   x
+
+let logseq seq =
+  seq
+  |> Seq.map log
+  
+let logseqf (transform: 'a -> 'b) seq =
+  seq
+  |> Seq.map transform
+  |> Seq.iter (log >> ignore)
+  seq

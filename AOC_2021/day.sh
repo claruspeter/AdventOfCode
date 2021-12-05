@@ -7,7 +7,7 @@ sed -i "/<Compile Include=\"Program.fs\" \/>/i\ \ \ \ <Compile Include=\"test${n
 
 cp src/aoc0.fs src/aoc$ndays.fs
 sed -i -e "s/Day0/Day${ndays}/g" src/aoc$ndays.fs
-sed -i "/<None Include=\"aoc0.fs\" \/>/i\ \ \ \ <Compile Include=\"aoc${ndays}.fs\" \/>" src/src.fsproj
+sed -i "/<Compile Include=\"aoc0.fs\" \/>/i\ \ \ \ <Compile Include=\"aoc${ndays}.fs\" \/>" src/src.fsproj
 
 touch data/aoc${ndays}_input.txt
 
