@@ -30,3 +30,16 @@ let toDec (s: char seq) =
           if c = '0' then 0 else (System.Math.Pow(2, i) |> int)
         )
       ) 0
+
+let matchingCommonBitAt (discriminator) (n:int) (data: string seq) =
+  if (data |> Seq.length) = 1 then
+    data
+  else
+    let mostcommon = 
+      data 
+      |> transposeBits 
+      |> Seq.skip n 
+      |> Seq.head
+      |> discriminator
+    data 
+      |>Seq.filter (fun x -> x.[n] = mostcommon)
