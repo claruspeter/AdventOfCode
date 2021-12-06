@@ -41,6 +41,17 @@ let log x =
   printfn "%A" x
   x
 
+let logf (transform: 'a -> 'b) x =
+  x |> transform |> printfn "%A"
+  x
+
+let printseq seq = 
+  seq 
+  |> Seq.map (fun x -> x.ToString())
+  |> Seq.toArray 
+  |> Array.sort 
+  |> fun x -> String.Join(",", x)
+
 let logseq seq =
   seq
   |> Seq.map log
