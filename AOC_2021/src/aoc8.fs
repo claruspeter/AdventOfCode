@@ -4,11 +4,13 @@ open System
 open AOC2021.Common
 
 let parse7DigitDisplayLine (s: string) =
-  let [| lhs; rhs |] = s.Split([| '|' |]) |> Array.take 2
-  (
-    lhs.Split([| ' '|], StringSplitOptions.RemoveEmptyEntries),
-    rhs.Split([| ' '|], StringSplitOptions.RemoveEmptyEntries)
-  )
+  match s.Split([| '|' |]) with 
+  | [| lhs; rhs |] ->
+    (
+      lhs.Split([| ' '|], StringSplitOptions.RemoveEmptyEntries),
+      rhs.Split([| ' '|], StringSplitOptions.RemoveEmptyEntries)
+    )
+  | _ -> failwith "Not a valid display line"
 
 let classify (s: string) =
   match s.Length with 
