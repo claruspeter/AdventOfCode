@@ -36,6 +36,10 @@ let (>==>) f g x =
   | Some y -> Some y
   | None -> g x
 
+let isError =
+  function
+  | Ok _ -> false
+  | Error _ -> true
 
 let log x =
   printfn "%A" x
