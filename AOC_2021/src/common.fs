@@ -76,3 +76,5 @@ let (|Regex|_|) pattern input =
         let m = Regex.Match(input, pattern, RegexOptions.Compiled)
         if m.Success then Some [for x in m.Groups -> x.Value]
         else None
+
+let charInt (c:char) = int c - int '0'
