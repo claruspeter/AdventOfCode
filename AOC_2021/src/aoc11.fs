@@ -68,3 +68,14 @@ let stepTime (grid: Grid<Octopus>): Grid<Octopus> =
     }
   inc 
   |> propagateFlash
+
+let numzeros grid =
+  grid.values
+  |> Seq.filter (fun (p, (v:Octopus)) -> v.energy = 0)
+  |> Seq.length
+
+let rec stepTimeTillSynchronised step (grid: Grid<Octopus>) =
+  if numzeros (grid) = 100 then
+    step
+  else
+    stepTimeTillSynchronised (step+1) (stepTime grid)

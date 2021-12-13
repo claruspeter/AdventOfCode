@@ -75,3 +75,23 @@ let A () =
   after100.values
     |> Array.sumBy (fun a -> (snd a).flashes)
     |> should equal 1591
+
+[<Fact>]
+let B_Sample () =
+  let data = sample |> parseOctupus
+  let after195 = 
+    [1..195]
+    |> Seq.fold (fun g i -> stepTime g ) data
+  after195.values
+    |> Array.filter (fun a -> (snd a).energy = 0)
+    |> Array.length
+    |> should equal 100
+  stepTimeTillSynchronised 0 data
+  |> should equal 195
+
+[<Fact>]
+let B () =
+  lines 11 
+    |> parseOctupus
+    |> stepTimeTillSynchronised 0
+    |> should equal 314
