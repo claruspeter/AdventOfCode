@@ -4,6 +4,11 @@ open System
 open AOC2021.Common
 
 type Position = {x:int;y:int}
+with 
+  static member parse (s:string) =
+    match s.Split([|','|]) with
+    | [|lhs; rhs|] -> {x=Int32.Parse lhs; y= Int32.Parse rhs}
+    | _ -> failwith "Not a Position"
 
 type Grid<'V> = {
   values: (Position * 'V)[]
@@ -11,8 +16,9 @@ type Grid<'V> = {
 with 
   member this.get (x,y) = 
     this.values 
-    |> Array.find (fun a -> (fst a) = {x=x;y=y} ) 
-    |> snd
+    |> Array.tryFind (fun a -> (fst a) = {x=x;y=y} ) 
+    |> Option.map snd
+    |> Option.defaultValue (Unchecked.defaultof<'V>)
   member this.getP (x,y) = ({x=x;y=y}, this.get(x,y))
   member this.set (x,y) v = 
     this.values 
@@ -24,6 +30,7 @@ with
     |> fun a -> {values = a}
   member this.xMax = this.values |> Seq.map (fun a -> (fst a).x) |> Seq.max
   member this.yMax = this.values |> Seq.map (fun a -> (fst a).y) |> Seq.max
+
 
 let parseGrid<'V> (valueParser: Position -> int -> 'V) (lines: string[]) : Grid<'V> = 
   lines 
