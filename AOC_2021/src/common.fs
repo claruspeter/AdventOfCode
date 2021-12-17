@@ -4,6 +4,7 @@ open System
 open System.IO
 open System.Text.RegularExpressions
 open Microsoft.FSharp.Core.Result
+open System.Collections.Generic
 
 let parseInts x = 
     try
@@ -78,3 +79,10 @@ let (|Regex|_|) pattern input =
         else None
 
 let charInt (c:char) = int c - int '0'
+
+type IDictionary<'A, 'B> with 
+  member this.OrDefault (defaultValue: 'B) (key: 'A) =
+    if this.ContainsKey key then 
+      this.[key]
+    else
+      defaultValue

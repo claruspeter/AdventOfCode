@@ -69,5 +69,5 @@ let B () =
   let folded = 
     folds
     |> Seq.fold foldAlong paper
-  folded |> printHeightMap (fun b -> if b then "#" else ".") |> printfn "%s"
+  folded |> printHeightMap (fun b -> if b then "#" else ".") |> ignore //|> printfn "%s"
   
