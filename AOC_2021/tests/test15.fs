@@ -37,10 +37,10 @@ let A () =
     lines 15
     |> parseGrid (fun p v -> v)
     |> euler
-  result 
-    |> printHeightMap (fun a -> sprintf "%03d " a)
-    |> printfn "%s"
-  result.get (0,0) |> should equal 699
+  // result 
+  //   |> printHeightMap (fun a -> sprintf "%03d " a)
+  //   |> printfn "%s"
+  result.get (0,0) |> should equal 698
 
 
 
