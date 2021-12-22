@@ -25,6 +25,7 @@ let A_Sample () =
   let result = 
     sample
     |> parseGrid (fun p v -> v)
+    |> toWorkingArray
     |> aStar
   result.[9, 9] |> fun a -> a.g |> should equal 40
 
@@ -33,8 +34,27 @@ let A () =
   let result = 
     lines 15
     |> parseGrid (fun p v -> v)
+    |> toWorkingArray
     |> aStar
   result.[99, 99] |> fun a -> a.g |> should equal 698
 
 
+[<Fact>]
+let B_Sample () =
+  let result = 
+    sample
+    |> parseGrid (fun p v -> v)
+    |> toWorkingArray
+    |> tileOut
+    |> aStar
+  result.[result.GetLength(0)-1, result.GetLength(1)-1] |> fun a -> a.g |> should equal 315
 
+// [<Fact>] // takes too long
+let B () =
+  let result = 
+    lines 15
+    |> parseGrid (fun p v -> v)
+    |> toWorkingArray
+    |> tileOut
+    |> aStar
+  result.[result.GetLength(0)-1, result.GetLength(1)-1] |> fun a -> a.g |> should equal 3022

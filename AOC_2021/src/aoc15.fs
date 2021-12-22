@@ -93,9 +93,8 @@ let rec private findPath  {grid=grid; opened=opened; } (currentVal: AVal) =
         |> Seq.minBy (fun a -> a.f)
       findPath updatedAndClosed nextCurrent
 
-let aStar (grid: Grid<int>) = 
-  let initial = 
-    Array2D.init 
+let toWorkingArray (grid: Grid<int>) = 
+  Array2D.init 
       (grid.xMax + 1) 
       (grid.yMax + 1)
       (fun x y -> 
@@ -109,5 +108,23 @@ let aStar (grid: Grid<int>) =
         }
       )
 
+let aStar initial = 
   findPath {grid=initial; opened=Set.empty.Add {x=0;y=0}; } (initial.[0,0])
   |> fun a -> a.grid
+
+let tileOut (initial: AVal[,]) =
+  let xMax = (initial.GetLength 0)
+  let yMax = (initial.GetLength 1)
+  Array2D.init
+    (xMax * 5)
+    (yMax * 5)
+    (fun x y -> 
+      let oldX = x % xMax
+      let oldY = y % yMax
+      let inc = (x / xMax) + (y/yMax)
+      {
+        initial[oldX,oldY] with 
+          position={x=x;y=y}
+          cost=(((initial[oldX,oldY].cost - 1) + inc) % 9) + 1
+      }
+    )
