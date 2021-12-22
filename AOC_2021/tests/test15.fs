@@ -25,22 +25,16 @@ let A_Sample () =
   let result = 
     sample
     |> parseGrid (fun p v -> v)
-    |> euler
-  // result 
-  //   |> printHeightMap (fun a -> sprintf "%02d " a)
-  //   |> printfn "%s"
-  result.get (0,0) |> should equal 40
+    |> aStar
+  result.[9, 9] |> fun a -> a.g |> should equal 40
 
 [<Fact>]
 let A () =
   let result = 
     lines 15
     |> parseGrid (fun p v -> v)
-    |> euler
-  // result 
-  //   |> printHeightMap (fun a -> sprintf "%03d " a)
-  //   |> printfn "%s"
-  result.get (0,0) |> should equal 698
+    |> aStar
+  result.[99, 99] |> fun a -> a.g |> should equal 698
 
 
 

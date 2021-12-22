@@ -9,6 +9,7 @@ with
     match s.Split([|','|]) with
     | [|lhs; rhs|] -> {x=Int32.Parse lhs; y= Int32.Parse rhs}
     | _ -> failwith "Not a Position"
+  member this.tuple = (this.x, this.y)
 
 type Grid<'V> = {
   values: (Position * 'V)[]

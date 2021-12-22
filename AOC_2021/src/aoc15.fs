@@ -5,76 +5,109 @@ open System.Collections.Generic
 open AOC2021.Common
 open AOC2021.Grids
 
-type VisitedValue = {
-  value: int
-  distance: int
+
+type AVal = {
+  cost: int
+  g: int
+  f: int
+  parent: Position option
+  isClosed : bool
+  position: Position
 }
-with member this.isVisited = this.distance <> Int32.MaxValue
 
-type Cell = Position * int
+type Cell = Position * AVal
 
+type SearchParams<'A> = {
+  grid: 'A[,]
+  opened: Position Set
+}
 
+let hDistance position =
+  (1000 - position.x) + (1000 - position.y)
 
-let pathcost (path: Cell list) = 
-  path 
-  |> List.sumBy snd
+let neighbours {x=x; y=y} (grid: AVal[,]) =
+  [
+    if y > 0 then grid.[x,y-1] |> Some else None
+    if x > 0 then grid.[x-1,y] |> Some else None
+    if y+1 < (grid.GetLength 0) then grid.[x,y+1] |> Some else None
+    if x+1 < (grid.GetLength 1) then grid.[x+1,y] |> Some else None
+  ]
+  |> List.choose id
 
-let printPath (path: Cell list) = 
-  path
-  |> List.map ( fun (pos, _) -> sprintf "%d,%d" pos.x pos.y)
-  |> List.toArray
-  |> fun x -> String.Join( " - ", x)
+let private applyNeighbour (currentVal) (acc: SearchParams<AVal>) (candidate) =
+  let notOpen = acc.opened |> Set.contains candidate.position |> not
+  let isCostEffective = candidate.g > currentVal.g + candidate.cost
+  if notOpen || isCostEffective then
+    let newG = currentVal.g + candidate.cost
+    let newF = newG + (hDistance candidate.position)
+    acc.grid[candidate.position.x, candidate.position.y] <- 
+      {
+        candidate with 
+          g = newG
+          f = newF
+          parent = Some candidate.position
+      }
+    let newOpened = if notOpen then acc.opened.Add candidate.position else acc.opened
+    { grid=acc.grid; opened=newOpened; }
+  else
+    acc
 
-let inc (acc:Grid<VisitedValue>) at =
-  let value = acc.get at
-  let nb = 
-    neighbours {x=fst at; y=snd at} acc
-    |> List.filter (fun (p,a) -> a.isVisited )
-  match nb with 
-  | [] -> acc
-  | nb -> 
-    let minDistance = 
-      nb
-      |> List.map (fun (p, a) -> a.distance )
-      |> List.min
-    let candidateDistance = value.value + minDistance
-    acc.set at {value with distance=if candidateDistance < value.distance then candidateDistance else value.distance}
+let private printIn (data: AVal[,]) =
+  [|0..(data.GetLength 1)-1|]
+  |> Array.map (fun y -> 
+    [|0..(data.GetLength 0)-1|]
+    |> Array.map (fun x -> if data[x,y].isClosed then "#" else "." )
+    |> fun a -> String.Join("", a)
+  )
+  |> fun a -> String.Join("\r\n", a)
 
+let rec private findPath  {grid=grid; opened=opened; } (currentVal: AVal) =
+  // let map = printIn grid
+  // if currentVal.position = {x=0;y=0} then 
+  //   printfn "%s" map
+  // else
+  //   printfn "\x1B[%dA%s" ((grid.GetLength 1) + 1) map 
+  // printfn "\x1B[LDistance: %d" (hDistance currentVal.position)
 
+  let unclosedNeighbours = neighbours currentVal.position grid |> List.filter (fun a -> a.isClosed |> not)
+  match unclosedNeighbours |> Seq.tryFind (fun v -> v.position = {x=(grid.GetLength 0)-1;y=(grid.GetLength 1)-1}) with 
+  | Some final -> 
+      grid.[final.position.x,final.position.y] <- {final with g=currentVal.g + final.cost}
+      {
+        grid=grid
+        opened=opened
+      }
+  | None -> 
+      let updated = 
+        unclosedNeighbours
+        |> List.fold (applyNeighbour currentVal) { grid=grid; opened=opened;}
+      updated.grid.[currentVal.position.x, currentVal.position.y] <- {(updated.grid.[currentVal.position.x, currentVal.position.y] ) with isClosed=true}
+      let updatedAndClosed = {
+        grid=updated.grid
+        opened=updated.opened.Remove currentVal.position
+      }
+      let nextCurrent =
+        updatedAndClosed.opened 
+        |> Set.toSeq
+        |> Seq.map (fun p -> updatedAndClosed.grid[p.x,p.y]) 
+        |> Seq.minBy (fun a -> a.f)
+      findPath updatedAndClosed nextCurrent
 
-let traverse (grid: Grid<int>) =
-  let visitedGrid = {
-    values = 
-      grid.values 
-      |> Array.map (fun (p, n) -> 
-          match p with 
-          | {x=0;y=0} ->  (p, {value=n; distance=0 } )
-          | _ ->  (p, {value=n; distance=Int32.MaxValue } )
+let aStar (grid: Grid<int>) = 
+  let initial = 
+    Array2D.init 
+      (grid.xMax + 1) 
+      (grid.yMax + 1)
+      (fun x y -> 
+        {
+          cost=grid.get (x,y)
+          parent=None
+          f=0
+          g=0
+          isClosed=false 
+          position={x=x;y=y}
+        }
       )
-  }
 
-  let indexes = 
-    [0..grid.xMax] 
-    |> Seq.collect (fun x -> 
-        [0..grid.yMax] 
-        |> Seq.map (fun y -> (x,y))
-      )
-    |> Seq.sortBy (fun (x,y) -> x + y )
-    |> logseq
-  indexes
-    |> Seq.fold inc visitedGrid
-
-let euler (grid: Grid<int>) =
-  let size = grid.xMax + 1
-  let costs = grid.values |> dict |> Dictionary<Position, int>
-  costs[{x=0;y=0}] <- 0
-  for i in [size-2..-1..0] do
-    costs.[{x=size-1; y=i}] <- costs.[{x=size-1; y=i}] + costs.[{x=size-1; y=i+1}]
-    costs.[{x=i; y=size-1}] <- costs.[{x=i; y=size-1}] + costs.[{x=i+1; y=size-1}]
-  for i in [size-2..-1..0] do
-    for j in [size-2..-1..0] do
-      costs.[{x=i; y=j}] <- costs.[{x=i; y=j}] + (min costs.[{x=i+1; y=j}] costs.[{x=i; y=j+1}])
-  costs
-  |> Seq.toArray
-  |> Seq.map (fun kv -> (kv.Key, kv.Value))
-  |> fun a -> {values = a |> Seq.toArray}
+  findPath {grid=initial; opened=Set.empty.Add {x=0;y=0}; } (initial.[0,0])
+  |> fun a -> a.grid
