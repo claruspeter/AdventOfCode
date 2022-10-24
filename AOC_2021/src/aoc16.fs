@@ -1,6 +1,7 @@
 module AOC2021.Day16
 
 open System
+open System.IO;
 open AOC2021.Common
 
 let private hexbin = 
@@ -25,9 +26,7 @@ let private hexbin =
 
 let private binToNum (s: seq<char>) = Convert.ToInt32(String(s |> Seq.toArray), 2)
 
-type Packet = {
-  version: int
-  typeId: int
+type ValuePacket = {
   values: string list
 } with 
   member this.total = 
@@ -35,32 +34,119 @@ type Packet = {
     |> String.concat ""
     |> fun x -> Convert.ToInt32(x, 2)
 
+type SubPacketLength = 
+  | Bits of int
+  | Packets of int
+
+type OperatorPacket = {
+  length: SubPacketLength
+  subPackets: Packet list
+}
+
+and PacketBody =
+  | Value of ValuePacket
+  | Operator of OperatorPacket
+
+and Packet = {
+  version: int
+  typeId: int
+  body: PacketBody
+}
+
+let private take n (stream:Stream) =
+  seq{
+    for i in 0..(n-1) do
+      (char) (stream.ReadByte())
+  }
+
 let hexToBin (hex:string) =
   hex
   |> Seq.map ( fun x -> hexbin.[x] )
   |> Seq.toArray
   |> fun x -> String.Join("", x)
 
-let yieldPackets (binStream: seq<char>) =
+let private yieldValues (binStream: Stream) =
+  let mutable foundEnd = false
   seq{
-    let chunks =
-      binStream
-      |> Seq.chunkBySize 5
-    yield! chunks |> Seq.takeWhile (fun x -> x.[0] = '1')
-    yield! chunks |> Seq.skipWhile (fun x -> x.[0] = '1') |> Seq.take 1
+    while not(foundEnd) do
+      let chunk =
+        binStream
+        |> take 5
+        |> Seq.toArray
+        |> String
+      yield chunk 
+      foundEnd <- chunk |> Seq.head |> (=) '0'
   }
 
-let stripPacket (packet: char[]) =
-  packet
-  |> Array.tail
-  |> String
+let private stripValue (value: String) = value.Substring(1)
 
 
 
-let decode (hex:string) : Packet=
+let rec decode (bin: Stream) : Packet =
+  let version = bin |> take 3 |> binToNum
+  let typeId = bin |> take 3 |> binToNum
+  match typeId with 
+  | 4 -> 
+    let values = bin |> yieldValues |> Seq.map stripValue |> Seq.toList
+    {
+      version = version
+      typeId = typeId
+      body = Value {values = values }
+    }
+  | _ -> 
+    let i = bin |> take 1 |> Seq.head
+    let length = 
+      match i with 
+      | '0' -> 
+        bin 
+        |> take 15 
+        |> binToNum
+        |> Bits
+      | '1' -> 
+        bin 
+        |> take 11 
+        |> binToNum
+        |> Packets
+      | _ -> failwithf "Unknown length mode: %A" i
+    let subPackets : Packet list = 
+      match length with 
+      | Bits n -> 
+          let range = bin |> take n |> Seq.map byte |> Seq.toArray
+          use stream = new MemoryStream(range)
+          seq{
+            while stream.Position < stream.Length do
+              yield (decode stream)
+          } |> Seq.toList
+
+      | Packets n ->
+        [1..n]
+        |> List.map (fun _ -> 
+          decode bin
+        )
+
+    {
+      version = version
+      typeId = typeId
+      body = Operator { length = length; subPackets = subPackets }
+    }
+
+let rec traceVersions (p: Packet) =
+  seq{
+    match p.body with 
+    | Operator body ->
+      yield (p.typeId = 4, p.version)
+      for sub in body.subPackets do
+        yield! (traceVersions sub)
+    | _ -> 
+      yield (p.typeId = 4, p.version)
+  }
+
+let sumVersions p = 
+  p
+  |> traceVersions
+  |> Seq.sumBy snd
+
+let decodeHex (hex: string) =
   let bin = hex |> hexToBin
-  {
-    version = bin |> Seq.take 3 |> binToNum
-    typeId = bin.Substring(3,3) |> binToNum
-    values = bin |> Seq.skip 6 |> yieldPackets |> Seq.map stripPacket |> Seq.toList
-  }
+  use stream = new MemoryStream(System.Text.ASCIIEncoding.ASCII.GetBytes(bin))
+  decode stream
