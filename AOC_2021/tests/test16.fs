@@ -21,8 +21,8 @@ let hex_sample = [
 
 let private packetValue (packet:Packet) =
   match packet.body with 
-  | Operator _ -> failwith "Not a value"
-  | Value p -> p.total
+  | Value p -> packet.total
+  | _ -> failwith "Not a value"
 
 [<Fact>]
 let DecodeHex () =
@@ -39,7 +39,7 @@ let SimpleNumber () =
   match raw.body with 
   | Value b ->
     b.values |> should equal ["0111"; "1110"; "0101"]
-    b.total |> should equal 2021
+    raw.total |> should equal 2021L
   | _ -> failwith "Not a value packet"
 
 [<Fact>]
@@ -51,8 +51,8 @@ let OperatorPacketWithBitsLength () =
   | Operator b ->
     b.length |> should equal (Bits 27)
     b.subPackets.Length |> should equal 2
-    b.subPackets.[0] |> packetValue |> should equal 10
-    b.subPackets.[1] |> packetValue |> should equal 20
+    b.subPackets.[0] |> packetValue |> should equal 10L
+    b.subPackets.[1] |> packetValue |> should equal 20L
   | _ -> failwith "Not an operator packet"
 
 [<Fact>]
@@ -64,9 +64,9 @@ let OperatorPacketWithPacketsLength () =
   | Operator b ->
     b.length |> should equal (Packets 3)
     b.subPackets.Length |> should equal 3
-    b.subPackets.[0] |> packetValue |> should equal 1
-    b.subPackets.[1] |> packetValue |> should equal 2
-    b.subPackets.[2] |> packetValue |> should equal 3
+    b.subPackets.[0] |> packetValue |> should equal 1L
+    b.subPackets.[1] |> packetValue |> should equal 2L
+    b.subPackets.[2] |> packetValue |> should equal 3L
   | _ -> failwith "Not an operator packet"
 
 [<Fact>]
@@ -88,6 +88,28 @@ let VersionSum (hex, expectedSum) =
 [<Fact>]
 let A () =
   raw 16
-    |> decodeHex 
-    |> sumVersions 
-    |> should equal 908
+  |> decodeHex 
+  |> sumVersions 
+  |> should equal 908
+
+[<Theory>]
+[<InlineData("C200B40A82", 3L)>]
+[<InlineData("04005AC33890", 54L)>]
+[<InlineData("880086C3E88112", 7L)>]
+[<InlineData("CE00C43D881120", 9L)>]
+[<InlineData("D8005AC2A8F0", 1L)>]
+[<InlineData("F600BC2D8F", 0L)>]
+[<InlineData("9C005AC2F8F0", 0L)>]
+[<InlineData("9C0141080250320F1802104A08", 1L)>]
+let OperatorSamples (hex, expectedTotal) =
+  hex
+  |> decodeHex
+  |> fun x -> x.total
+  |> should equal expectedTotal
+
+[<Fact>]
+let B () =
+  raw 16
+  |> decodeHex 
+  |> fun x -> x.total
+  |> should equal 10626195124371L

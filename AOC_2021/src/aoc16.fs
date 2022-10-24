@@ -28,11 +28,7 @@ let private binToNum (s: seq<char>) = Convert.ToInt32(String(s |> Seq.toArray), 
 
 type ValuePacket = {
   values: string list
-} with 
-  member this.total = 
-    this.values
-    |> String.concat ""
-    |> fun x -> Convert.ToInt32(x, 2)
+} 
 
 type SubPacketLength = 
   | Bits of int
@@ -45,13 +41,31 @@ type OperatorPacket = {
 
 and PacketBody =
   | Value of ValuePacket
-  | Operator of OperatorPacket
+  | Sum of OperatorPacket
+  | Product of OperatorPacket
+  | Minimum of OperatorPacket
+  | Maximum of OperatorPacket
+  | GreaterThan of OperatorPacket
+  | LessThan of OperatorPacket
+  | EqualTo of OperatorPacket
 
 and Packet = {
   version: int
   typeId: int
   body: PacketBody
 }
+
+let (|Operator|_|) (packet:PacketBody) =
+  match packet with 
+  | Value _ -> None
+  | Sum b
+  | Minimum b
+  | Maximum b
+  | GreaterThan b
+  | LessThan b
+  | EqualTo b
+  | Product b -> Some b
+
 
 let private take n (stream:Stream) =
   seq{
@@ -79,6 +93,22 @@ let private yieldValues (binStream: Stream) =
   }
 
 let private stripValue (value: String) = value.Substring(1)
+
+type Packet with 
+  member this.total = 
+    match this.body with 
+    | Value body ->
+      body.values
+      |> String.concat ""
+      |> fun x -> Convert.ToInt64(x, 2)
+      // |> logm "VALUE"
+    | Sum body -> body.subPackets |> List.sumBy (fun x -> x.total) //|> logm "SUM"
+    | Product body -> body.subPackets |> List.fold ( fun acc x -> acc * x.total) 1
+    | Maximum body -> body.subPackets |> List.map (fun x -> x.total) |> List.max
+    | Minimum body -> body.subPackets |> List.map (fun x -> x.total) |> List.min
+    | GreaterThan body -> if body.subPackets.[0].total > body.subPackets.[1].total then 1 else 0
+    | LessThan body -> if body.subPackets.[0].total < body.subPackets.[1].total then 1 else 0
+    | EqualTo body -> if body.subPackets.[0].total = body.subPackets.[1].total then 1 else 0
 
 
 
@@ -123,11 +153,20 @@ let rec decode (bin: Stream) : Packet =
         |> List.map (fun _ -> 
           decode bin
         )
-
+    let operator = { length = length; subPackets = subPackets }
     {
       version = version
       typeId = typeId
-      body = Operator { length = length; subPackets = subPackets }
+      body = 
+        match typeId with 
+        | 0 -> Sum operator
+        | 1 -> Product operator
+        | 2 -> Minimum operator
+        | 3 -> Maximum operator
+        | 5 -> GreaterThan operator
+        | 6 -> LessThan operator
+        | 7 -> EqualTo operator
+        | _ -> failwithf "Unknown operator type id: %d" typeId
     }
 
 let rec traceVersions (p: Packet) =

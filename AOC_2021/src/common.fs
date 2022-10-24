@@ -46,6 +46,10 @@ let log x =
   printfn "%A" x
   x
 
+let logm msg x =
+  printfn "%s: %A" msg x
+  x
+
 let logf (transform: 'a -> 'b) x =
   x |> transform |> printfn "%A"
   x
