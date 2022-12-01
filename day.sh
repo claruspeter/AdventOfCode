@@ -1,13 +1,13 @@
-ndays=$(ls AOC_2020/tests/Test*.fs | wc -l)
+ndays=$(ls AOC_2022/tests/test*.fs | wc -l)
 echo $ndays
 
-cp AOC_2020/tests/Test0.fs AOC_2020/tests/Test$ndays.fs
-sed -i -e "s/0/${ndays}/g" AOC_2020/tests/Test$ndays.fs
-sed -i "/<Compile Include=\"Program.fs\" \/>/i\ \ \ \ <Compile Include=\"Test${ndays}.fs\" \/>" AOC_2020/tests/tests.fsproj
+cp AOC_2022/tests/test0.fs AOC_2022/tests/test$ndays.fs
+sed -i -e "s/Day0/Day${ndays}/g" AOC_2022/tests/test$ndays.fs
+sed -i "/<Compile Include=\"Program.fs\" \/>/i\ \ \ \ <Compile Include=\"test${ndays}.fs\" \/>" AOC_2022/tests/tests.fsproj
 
-cp AOC_2020/src/aoc0.fs AOC_2020/src/aoc$ndays.fs
-sed -i -e "s/0/${ndays}/g" AOC_2020/src/aoc$ndays.fs
-sed -i "/<None Include=\"aoc0.fs\" \/>/i\ \ \ \ <Compile Include=\"aoc${ndays}.fs\" \/>" AOC_2020/src/AdventOfCode.fsproj
+cp AOC_2022/src/aoc0.fs AOC_2022/src/aoc$ndays.fs
+sed -i -e "s/Day0/Day${ndays}/g" AOC_2022/src/aoc$ndays.fs
+sed -i "/<Compile Include=\"aoc0.fs\" \/>/i\ \ \ \ <Compile Include=\"aoc${ndays}.fs\" \/>" AOC_2022/src/src.fsproj
 
-touch AOC_2020/data/aoc${ndays}_input.txt
+touch AOC_2022/data/aoc${ndays}_input.txt
 
