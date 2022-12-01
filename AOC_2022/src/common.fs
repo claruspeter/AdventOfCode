@@ -1,4 +1,4 @@
-module AOC2021.Common
+module AOC2022.Common
 
 open System 
 open System.IO
