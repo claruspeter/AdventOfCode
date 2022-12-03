@@ -8,7 +8,7 @@ open AOC2022.Day1
 
 [<Fact>]
 let A_Sample () =
-  let lines = [
+  let input = [
     "1000"
     "2000"
     "3000"
@@ -25,11 +25,17 @@ let A_Sample () =
     "10000"
   ]
 
-  let byElf = lines |> groupCalories
+  let byElf = input |> groupCalories
   byElf |> List.length |> should equal 5
   let sums = byElf |> List.map (fun elf -> elf |> List.sum) 
   sums |> should equal [6000L; 4000L; 11000L; 24000L; 10000L]
 
+[<Fact>]
+let A () =
+  let input = lines 1
 
+  let byElf = input |> groupCalories
+  let sums = byElf |> Seq.map (fun elf -> elf |> Seq.sum) 
+  sums |> Seq.max |> should equal 1L
 
 
