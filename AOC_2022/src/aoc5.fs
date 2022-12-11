@@ -72,3 +72,15 @@ let parseCratesAndInstructions (lines: string list) =
           )
         |> Dictionary<int, CrateStack>
   }
+
+let move (stacks: Dictionary<int, CrateStack>) (instruction: Instruction) : Dictionary<int, CrateStack> =
+  for i in [1..instruction.n] do
+    let crate = stacks.[instruction.source].Pop()
+    stacks.[instruction.destination].Push crate
+  stacks
+
+let topCrates (stacks: Dictionary<int, CrateStack>) =
+  stacks
+  |> Seq.sortBy (fun x -> x.Key)
+  |> Seq.map ( fun x -> x.Value.Peek()) 
+  |> fun x -> String.Join("", x)
