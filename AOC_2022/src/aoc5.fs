@@ -73,10 +73,18 @@ let parseCratesAndInstructions (lines: string list) =
         |> Dictionary<int, CrateStack>
   }
 
-let move (stacks: Dictionary<int, CrateStack>) (instruction: Instruction) : Dictionary<int, CrateStack> =
+let move_9000 (stacks: Dictionary<int, CrateStack>) (instruction: Instruction) : Dictionary<int, CrateStack> =
   for i in [1..instruction.n] do
     let crate = stacks.[instruction.source].Pop()
     stacks.[instruction.destination].Push crate
+  stacks
+
+let move_9001 (stacks: Dictionary<int, CrateStack>) (instruction: Instruction) : Dictionary<int, CrateStack> =
+  let tempStack = new CrateStack()
+  for i in [1..instruction.n] do
+    tempStack.Push (stacks.[instruction.source].Pop())
+  for i in [1..instruction.n] do
+    stacks.[instruction.destination].Push (tempStack.Pop())
   stacks
 
 let topCrates (stacks: Dictionary<int, CrateStack>) =

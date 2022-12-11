@@ -32,11 +32,11 @@ let A_Sample_moving () =
   stacks[1] |> Seq.toList |> should equal ['N'; 'Z']
   stacks[2] |> Seq.toList |> should equal ['D'; 'C'; 'M']
   stacks[3] |> Seq.toList |> should equal ['P']
-  let a = move stacks (instructions.[0])
+  let a = move_9000 stacks (instructions.[0])
   a[1] |> Seq.toList |> should equal ['D'; 'N'; 'Z']
   a[2] |> Seq.toList |> should equal ['C'; 'M']
   a[3] |> Seq.toList |> should equal ['P']
-  let b = move a (instructions.[1])
+  let b = move_9000 a (instructions.[1])
   b[1] |> should be Empty
   b[2] |> Seq.toList |> should equal ['C'; 'M']
   b[3] |> Seq.toList |> should equal ['Z'; 'N'; 'D'; 'P']
@@ -44,7 +44,7 @@ let A_Sample_moving () =
 [<Fact>]
 let A_Sample_after_moved () =
   let {stacks=stacks; instructions=instructions} = sample |> parseCratesAndInstructions
-  let moved = instructions |> Seq.fold move stacks
+  let moved = instructions |> Seq.fold move_9000 stacks
   moved[1] |> Seq.toList |> should equal ['C']
   moved[2] |> Seq.toList |> should equal ['M']
   moved[3] |> Seq.toList |> should equal ['Z'; 'N'; 'D'; 'P']
@@ -53,5 +53,20 @@ let A_Sample_after_moved () =
 [<Fact>]
 let A () =
   let {stacks=stacks; instructions=instructions} = lines 5 |> parseCratesAndInstructions
-  let moved = instructions |> Seq.fold move stacks
+  let moved = instructions |> Seq.fold move_9000 stacks
   moved |> topCrates |> should equal "CVCWCRTVQ"
+
+[<Fact>]
+let B_Sample_after_moved () =
+  let {stacks=stacks; instructions=instructions} = sample |> parseCratesAndInstructions
+  let moved = instructions |> Seq.fold move_9001 stacks
+  moved[1] |> Seq.toList |> should equal ['M']
+  moved[2] |> Seq.toList |> should equal ['C']
+  moved[3] |> Seq.toList |> should equal ['D'; 'N'; 'Z'; 'P']
+  moved |> topCrates |> should equal "MCD"
+
+[<Fact>]
+let B () =
+  let {stacks=stacks; instructions=instructions} = lines 5 |> parseCratesAndInstructions
+  let moved = instructions |> Seq.fold move_9001 stacks
+  moved |> topCrates |> should equal "CNSCZWLVT"
