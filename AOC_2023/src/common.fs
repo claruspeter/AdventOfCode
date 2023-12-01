@@ -27,11 +27,13 @@ let pretty result =
     | Ok _ -> "OK"
     | Error s -> sprintf "ERROR: %s" s
 
+/// <summary>Kliesi operator with Result</summary>
 let (>=>) f g x =
   match f x with 
   | Ok y -> g y
   | Error s -> Error s
 
+/// <summary>Kliesi operator with Option</summary>
 let (>==>) f g x =
   match f x with 
   | Some y -> Some y
@@ -48,6 +50,11 @@ let log x =
 
 let logm msg x =
   printfn "%s: %A" msg x
+  x
+
+let logm2File fn msg x =
+  sprintf "%s: %A\r\n" msg x
+  |> fun txt -> File.AppendAllText(fn, txt)
   x
 
 let logf (transform: 'a -> 'b) x =
@@ -75,14 +82,29 @@ let filterDoubleArray<'T> (predicate: 'T -> bool ) (board: 'T array array) =
   board
   |> Array.collect (Array.filter predicate)
 
+// let (|Regex|_|) pattern input =
+//     if input = null then None
+//     else
+//         let m = Regex.Match(input, pattern, RegexOptions.Compiled)
+//         if m.Success then Some [for x in m.Groups -> x.Value]
+//         else None
+
 let (|Regex|_|) pattern input =
     if input = null then None
     else
-        let m = Regex.Match(input, pattern, RegexOptions.Compiled)
-        if m.Success then Some [for x in m.Groups -> x.Value]
-        else None
+        Regex.Matches(input, pattern, RegexOptions.Compiled)
+        |> Seq.collect (fun m -> [for x in m.Groups -> x.Value] )
+        |> Seq.toList
+        |> Some
 
 let charInt (c:char) = int c - int '0'
+
+let CharInt c =
+  match charInt c with 
+  | x when x >=0 && x <=9 -> Some x
+  | _ -> None
+
+let (|CharInt|_|) c = CharInt c
 
 type IDictionary<'A, 'B> with 
   member this.OrDefault (defaultValue: 'B) (key: 'A) =
