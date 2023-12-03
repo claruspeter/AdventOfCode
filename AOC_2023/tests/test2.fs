@@ -26,3 +26,18 @@ let A () =
   |> findPossibleGames {n=0; red=12; green=13; blue=14}
   |> List.sum
   |> should equal 2913
+
+[<Fact>]
+let B_Sample () =
+  sample
+  |> findMinimumGames
+  |> List.map gamePower
+  |> should equal [48; 12; 1560; 630; 36]
+
+[<Fact>]
+let B () =
+  lines 2
+  |> findMinimumGames
+  |> List.map gamePower
+  |> List.sum
+  |> should equal 55593

@@ -60,3 +60,9 @@ let findPossibleGames (limit:ColourCount) (lines:string list) =
       | _ -> None
   )
 
+let findMinimumGames (lines:string list) : ColourCount list=
+  lines 
+  |> List.map maxCount
+
+let gamePower (colours: ColourCount) =
+  colours.blue * colours.green * colours.red
