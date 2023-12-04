@@ -53,20 +53,32 @@ let private findNumbers (lines: string list) =
   |> List.indexed
   |> List.collect (fun (y,line) -> line |> Seq.indexed |> Seq.toList |> findNumbersInLine y [] )
 
-let private isAdjacentTo (symbols:Symbol list) (number:Number) =
+let private isAdjacentTo (symbol:Symbol) number= 
+  symbol.y >= number.y - 1
+  && symbol.y <= number.y + 1
+  && symbol.x >= number.x1 - 1
+  && symbol.x <= number.x2 + 1
+
+let private isNumberAdjacentTo (symbols:Symbol list) (number:Number) =
   symbols
-  |> Seq.exists ( fun symbol -> 
-      symbol.y >= number.y - 1
-      && symbol.y <= number.y + 1
-      && symbol.x >= number.x1 - 1
-      && symbol.x <= number.x2 + 1
-    )
+  |> Seq.exists ( fun symbol -> isAdjacentTo symbol number)
 
 let partNumbers lines =
   let symbols = lines |> findSymbols
   let numbers = lines |> findNumbers
   let result = 
     numbers
-    |> List.filter (isAdjacentTo symbols)
-
+    |> List.filter (isNumberAdjacentTo symbols)
   result |> List.map (fun x -> x.v)
+
+let private calculateGearRatio numbers symbol =
+  match numbers |> List.filter (fun number -> isAdjacentTo symbol number) with 
+  | [ a; b ] -> a.v * b.v |> Some
+  | _ -> None
+  
+
+let gearRatios lines = 
+  let gears = lines |> findSymbols |> List.filter (fun s -> s.v = '*')
+  let numbers = lines |> findNumbers
+  gears
+  |> List.choose (calculateGearRatio numbers)
