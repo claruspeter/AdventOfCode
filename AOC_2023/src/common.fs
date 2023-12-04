@@ -82,13 +82,6 @@ let filterDoubleArray<'T> (predicate: 'T -> bool ) (board: 'T array array) =
   board
   |> Array.collect (Array.filter predicate)
 
-// let (|Regex|_|) pattern input =
-//     if input = null then None
-//     else
-//         let m = Regex.Match(input, pattern, RegexOptions.Compiled)
-//         if m.Success then Some [for x in m.Groups -> x.Value]
-//         else None
-
 let (|Regex|_|) pattern input =
     if input = null then None
     else
