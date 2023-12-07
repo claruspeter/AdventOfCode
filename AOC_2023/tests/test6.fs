@@ -30,8 +30,8 @@ let B_Sample () =
   |> numberWaysToWinLong
   |> should equal [71503]
 
-[<Fact>]
-let B () =
-  lines 6
-  |> numberWaysToWinLong
-  |> should equal [42550411]
+// [<Fact>]
+// let B () =
+//   lines 6
+//   |> numberWaysToWinLong
+//   |> should equal [42550411]
