@@ -22,6 +22,16 @@ let A () =
   lines 6
   |> numberWaysToWin
   |> List.reduce (*)
-  |> should equal 1234
+  |> should equal 1195150
 
+[<Fact>]
+let B_Sample () =
+  sample
+  |> numberWaysToWinLong
+  |> should equal [71503]
 
+[<Fact>]
+let B () =
+  lines 6
+  |> numberWaysToWinLong
+  |> should equal [42550411]

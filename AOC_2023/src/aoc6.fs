@@ -4,23 +4,37 @@ open System
 open AOC2023.Common
 
 type private Race = {
-  time: int; 
-  distance: int
+  time: int64; 
+  distance: int64
 }with 
-  member this.PossibleDistances =
-    [1..this.time]
-    |> List.map (fun speed -> speed * (this.time - speed))
+  member this.WinningDistances =
+    [1L..this.time]
+    |> List.choose (fun speed -> 
+        match speed * (this.time - speed) with 
+        | d when d > this.distance -> Some d
+        | _ -> None
+    )
 
-let private parseRaces (lines:string list) =
+let private parseRaceLineWithSpaces (line:string) =
+  line.Substring(10).Split([|' '|], StringSplitOptions.RemoveEmptyEntries) |> Array.toList
+
+let private parseRaceLineWithoutSpaces (line:string) =
+  line.Substring(10).Replace(" ", "") |> List.singleton
+
+let private parseRaces lineParser (lines:string list) =
   lines
-  |> List.map (fun line -> line.Substring(10).Split([|' '|], StringSplitOptions.RemoveEmptyEntries) |> Array.toList)
+  |> List.map lineParser
   |>  function
       | [a;b] -> List.zip a b
       | x -> failwithf "Impossible! %A" x
-  |> List.map (fun (a, b) -> {time=int a; distance=int b})
-  |> List.map (fun race -> race.PossibleDistances |> List.filter (fun d -> d > race.distance) |> List.length )
-  
+  |> List.map (fun (a, b) -> {time=int64 a; distance=int64 b})
+  |> List.map (fun race -> race.WinningDistances |> List.length )
+
 
 let numberWaysToWin (lines:string list) =
   lines
-  |> parseRaces
+  |> parseRaces parseRaceLineWithSpaces
+
+let numberWaysToWinLong (lines:string list) =
+  lines
+  |> parseRaces parseRaceLineWithoutSpaces
