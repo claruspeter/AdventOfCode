@@ -39,6 +39,13 @@ let (>==>) f g x =
   | Some y -> Some y
   | None -> g x
 
+let choose (pipe: ('a -> 'b option) list) (a: 'a): 'b option =
+  pipe
+  |> List.skipWhile ( fun p -> p a |> Option.isNone)
+  |>  function
+      | [] -> None
+      | head::tail -> head a
+
 let isError =
   function
   | Ok _ -> false
