@@ -117,6 +117,5 @@ let findClosestLocationFromSeedRanges (lines: string list) =
     seq [loc.destination..(loc.size + loc.destination - 1L)]
     |> Seq.map fullRevMap
 
-  printfn "%A" qqq
 
   46
