@@ -50,7 +50,7 @@ let rec private walk currentNodes lrIndex network =
 
 let private walkNetwork starters network =
   let startingNodes = network |> starters
-  startingNodes |> List.map (fun x -> x.name) |> printfn "Starting with %A" 
+  //startingNodes |> List.map (fun x -> x.name) |> printfn "Starting with %A" 
   walk startingNodes 0 network
 
 let starterGhost network = 
