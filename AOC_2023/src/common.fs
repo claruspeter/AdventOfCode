@@ -89,6 +89,9 @@ let filterDoubleArray<'T> (predicate: 'T -> bool ) (board: 'T array array) =
   board
   |> Array.collect (Array.filter predicate)
 
+let Join (separator: string) (parts: 'a seq) = 
+  String.Join(separator, parts)
+
 let (|Regex|_|) pattern input =
     if input = null then None
     else
