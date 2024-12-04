@@ -1,3 +1,6 @@
+2024:
+	cd AOC_2024/tests; dotnet watch test
+
 2023:
 	cd AOC_2023/tests; dotnet watch test
 
