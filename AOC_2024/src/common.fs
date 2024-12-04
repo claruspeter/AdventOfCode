@@ -12,6 +12,11 @@ let parseInts x =
     with
     | _ -> None
 
+let parseIntList (line: string) =
+  line.Split([|' '|], StringSplitOptions.TrimEntries ||| StringSplitOptions.RemoveEmptyEntries)
+  |> Array.map (Int32.Parse)
+  |> Array.toList
+
 let raw n = File.ReadAllText(sprintf "../../../../data/aoc%d_input.txt" n)
 
 let lines n = File.ReadAllLines(sprintf "../../../../data/aoc%d_input.txt" n) |> Array.toList
