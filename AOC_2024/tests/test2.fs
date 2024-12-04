@@ -34,5 +34,21 @@ let A () =
     |> List.length
     |> should equal 490
 
+[<Fact>]
+let B_Sample () =
+  let safe = 
+    sample
+    |> safetyWithTolerance
+  safe 
+    |> should equal [true; false; false; true; true; true;]
 
 
+[<Fact>]
+let B () =
+  let safe = 
+    lines 2
+    |> safetyWithTolerance
+  safe 
+    |> List.filter id
+    |> List.length
+    |> should equal 536
