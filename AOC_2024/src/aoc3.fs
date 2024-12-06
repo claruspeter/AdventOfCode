@@ -16,12 +16,37 @@ let extractMuls (line:string) =
 
 let calcMul (a,b) = a*b
 
-let private removeDont (line: string) =
-  line.Split(_dont, StringSplitOptions.RemoveEmptyEntries)
-  |> Array.head
+type Token =
+  | Mul of a:int * b:int
+  | Do
+  | Dont
 
+let tokenise line =
+  match line with 
+  | RegexMatch @"(mul\(\d+,\d+\))|(do\(\))|(don't\(\))" x ->
+    x 
+    |> List.choose (
+      function 
+      | Regex @"mul\((\d+),(\d+)\)" m when m.Length = 3 -> 
+          m
+          |> fun x -> (x.[1] |> int, x.[2] |> int) |> Mul
+          |> Some
+      | "do()" -> Some Do
+      | "don't()" -> Some Dont
+      | _ -> None
+    )
+  | _ -> []
 
-let splitConditional (line: string) =
-  line.Split(_do, StringSplitOptions.RemoveEmptyEntries)
-  |> Array.map removeDont
-  |> Array.toList
+type Processor = { processing: bool; data:(int*int) list}
+
+let maskMuls tokens = 
+  let result = 
+    tokens 
+    |> List.fold (fun (acc:Processor) x -> 
+      match acc.processing, x with 
+      | _, Do -> { acc with processing=true }
+      | _, Dont -> { acc with processing=false }
+      | true, Mul (a,b) -> {acc with data = acc.data @ [(a,b)]}
+      | false, Mul (a,b) -> acc
+    ) { Processor.processing=true; data=[] }
+  result.data

@@ -105,6 +105,14 @@ let (|Regex|_|) pattern input =
         |> Seq.toList
         |> Some
 
+let (|RegexMatch|_|) pattern input =
+    if input = null then None
+    else
+        Regex.Matches(input, pattern, RegexOptions.Compiled)
+        |> Seq.map (fun m -> m.Value )
+        |> Seq.toList
+        |> Some
+
 let charInt (c:char) = int c - int '0'
 
 let CharInt c =

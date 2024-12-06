@@ -32,10 +32,8 @@ let A () =
 
 [<Fact>]
 let B_Sample () =
-  let muls = 
-    sampleB
-    |> List.collect splitConditional
-    |> List.collect extractMuls
+  let tokens = sampleB|> List.collect tokenise
+  let muls = tokens |> maskMuls
   muls
     |> should equal [(2,4); (8,5)] 
   muls
@@ -46,8 +44,8 @@ let B_Sample () =
 [<Fact>]
 let B () =
   lines 3
-    |> List.collect splitConditional
-    |> List.collect extractMuls
+    |> List.collect tokenise
+    |> maskMuls
     |> List.map calcMul
     |> List.sum
-    |> should equal 153469856
+    |> should equal 77055967
