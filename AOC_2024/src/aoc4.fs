@@ -15,7 +15,7 @@ type Starter = {
   c: char
 }
 
-let indexStarters (board: Board) =
+let indexStarters startChar (board: Board) =
   board
   |> List.mapi (fun y row -> 
     row
@@ -24,11 +24,17 @@ let indexStarters (board: Board) =
     )
   )
   |> List.collect id
-  |> List.filter (fun x -> x.c = 'X')
+  |> List.filter (fun x -> x.c = startChar)
+
+type FoundWord = {
+  word: string
+  dx: int
+  dy: int
+}
 
 type WithWords = {
   starter: Starter
-  words: string list
+  words: FoundWord list
 }
 
 let getLetter (board: Board) x y =
@@ -38,7 +44,17 @@ let getLetter (board: Board) x y =
     board.[y].[x]
 
 let findWord board x y dx dy =
-  [|1..3|] |> Array.map (fun i -> getLetter board (x + i * dx) (y + i * dy) ) |> String
+  [|1..3|] 
+  |> Array.map (fun i -> getLetter board (x + i * dx) (y + i * dy) ) 
+  |> String
+  |> fun w -> {word = w; dx=dx; dy=dy}
+
+
+let findCrossWord board x y dx dy =
+  [|-1..1|] 
+  |> Array.map (fun i -> getLetter board (x + i * dx) (y + i * dy) ) 
+  |> String
+  |> fun w -> {word = w; dx=dx; dy=dy}
 
 let makeWords (board: Board) (starters: Starter list) = 
   starters
@@ -59,8 +75,28 @@ let makeWords (board: Board) (starters: Starter list) =
     }
   )
 
+let makeDiagonalWords (board: Board) (starters: Starter list) = 
+  starters
+  |> List.map (fun s -> 
+    let finder = findCrossWord board s.x s.y
+    {
+      starter=s
+      words = [
+        finder 1 -1
+        finder 1 1
+        finder -1 -1
+        finder -1 1
+      ]
+    }
+  )
+
 let allXmas (words:WithWords list) =
   words
   |> List.collect (fun x -> x.words |> List.map (fun w -> (x.starter, w)))
-  |> List.filter (fun (s,w) -> w = "MAS")
+  |> List.filter (fun (s,w) -> w.word = "MAS")
+
+let allCrossedMasses (words:WithWords list) =
+  words
+  |> List.map ( fun x -> {x with words=x.words |> List.filter (fun w -> w.word = "MAS")})
+  |> List.filter (fun x -> x.words.Length = 2)
 

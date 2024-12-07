@@ -23,7 +23,7 @@ let sample =[
 let A_Sample () =
   let board = sample |> toBoard
   board
-    |> indexStarters 
+    |> indexStarters 'X'
     |> makeWords board
     |> allXmas
     |> should haveLength 18
@@ -35,9 +35,27 @@ let A () =
     |> toBoard
   let found =
     board
-    |> indexStarters 
+    |> indexStarters 'X'
     |> makeWords board
     |> allXmas
   found.Length |> should equal 2654
 
 
+[<Fact>]
+let B_Sample () =
+  let board = sample |> toBoard
+  board
+    |> indexStarters 'A'
+    |> makeDiagonalWords board
+    |> allCrossedMasses
+    |> should haveLength 9
+
+[<Fact>]
+let B () =
+  let board = lines 4 |> toBoard
+  let found =
+    board
+    |> indexStarters 'A'
+    |> makeDiagonalWords board
+    |> allCrossedMasses
+  found.Length|> should equal 1990
