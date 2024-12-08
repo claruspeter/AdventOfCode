@@ -113,6 +113,9 @@ let (|RegexMatch|_|) pattern input =
         |> Seq.toList
         |> Some
 
+let (|Index|_|) (a:'a) (items: 'a list)  =
+  items |> List.tryFindIndex (fun x -> x=a) 
+
 let charInt (c:char) = int c - int '0'
 
 let CharInt c =
