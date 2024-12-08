@@ -32,6 +32,17 @@ let pretty result =
     | Ok _ -> "OK"
     | Error s -> sprintf "ERROR: %s" s
 
+let swap (a:int) (b:int) (items: 'a list) = 
+  let aVal = items.[a]
+  let bVal = items.[b]
+  items |> List.mapi (fun i x -> if i=a then bVal else if i=b then aVal else x )
+
+let swapByValue (a:'a) (b:'a) (items: 'a list) =
+  match items |> List.tryFindIndex (fun x -> x=a), items |> List.tryFindIndex (fun x -> x=b) with 
+  | Some aIdx, Some bIdx -> items |> swap aIdx bIdx
+  | _, _ -> items
+  
+
 /// <summary>Kliesi operator with Result</summary>
 let (>=>) f g x =
   match f x with 

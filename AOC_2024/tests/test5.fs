@@ -54,4 +54,21 @@ let A () =
   |> List.sum
   |> should equal 5064
 
+[<Fact>]
+let B_Sample () =
+  let rules, updates = parse sample
+  rules |> should haveLength 21
+  updates |> should haveLength 6
+  let invalidUpdates = updates |> List.filter (fun x -> (obeysRules rules x) |> not)
+  let reordered = invalidUpdates |> List.map (reorder 0 rules)
+  reordered |> List.map middle |> should equal [47; 29; 47]
 
+[<Fact>]
+let B () =
+  let rules, updates = lines 5 |> parse
+  updates
+  |> List.filter (fun x -> (obeysRules rules x) |> not)
+  |> List.map (reorder 0 rules)
+  |> List.map middle
+  |> List.sum
+  |> should equal 5064
