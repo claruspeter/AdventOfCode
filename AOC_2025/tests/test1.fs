@@ -19,7 +19,7 @@ let sample = [
   "L82"
 ]
 
-let start = {startingValue=50; cmd="initial"; finalValue=50; isZero=false; negativeCrosses=0; positiveCrosses=0}
+let start = {startingValue=50; cmd="initial"; finalValue=50; isZero=false; passedZero=0; belowZero=false}
 
 [<Fact>]
 let A_Sample () =
@@ -56,16 +56,16 @@ let B_Sample () =
   result
     |> should equal [
         start
-        {startingValue=50; cmd="L68"; finalValue=82; isZero=false; negativeCrosses=1; positiveCrosses=0}
-        {startingValue=82; cmd="L30"; finalValue=52; isZero=false; negativeCrosses=0; positiveCrosses=0}
-        {startingValue=52; cmd="R48"; finalValue=0 ; isZero=true ; negativeCrosses=0; positiveCrosses=0}
-        {startingValue=0;  cmd="L5";  finalValue=95; isZero=false; negativeCrosses=0; positiveCrosses=0}
-        {startingValue=95; cmd="R60"; finalValue=55; isZero=false; negativeCrosses=0; positiveCrosses=1}
-        {startingValue=55; cmd="L55"; finalValue=0 ; isZero=true ; negativeCrosses=0; positiveCrosses=0}
-        {startingValue=0;  cmd="L1";  finalValue=99; isZero=false; negativeCrosses=0; positiveCrosses=0}
-        {startingValue=99; cmd="L99"; finalValue=0 ; isZero=true ; negativeCrosses=0; positiveCrosses=0}
-        {startingValue=0;  cmd="R14"; finalValue=14; isZero=false; negativeCrosses=0; positiveCrosses=0}
-        {startingValue=14; cmd="L82"; finalValue=32; isZero=false; negativeCrosses=1; positiveCrosses=0}
+        {startingValue=50; cmd="L68"; finalValue=82; isZero=false; passedZero=0; belowZero=true }
+        {startingValue=82; cmd="L30"; finalValue=52; isZero=false; passedZero=0; belowZero=false}
+        {startingValue=52; cmd="R48"; finalValue=0 ; isZero=true ; passedZero=1; belowZero=false }
+        {startingValue=0;  cmd="L5";  finalValue=95; isZero=false; passedZero=0; belowZero=false}
+        {startingValue=95; cmd="R60"; finalValue=55; isZero=false; passedZero=1; belowZero=false}
+        {startingValue=55; cmd="L55"; finalValue=0 ; isZero=true ; passedZero=0; belowZero=true }
+        {startingValue=0;  cmd="L1";  finalValue=99; isZero=false; passedZero=0; belowZero=false}
+        {startingValue=99; cmd="L99"; finalValue=0 ; isZero=true ; passedZero=0; belowZero=true }
+        {startingValue=0;  cmd="R14"; finalValue=14; isZero=false; passedZero=0; belowZero=false}
+        {startingValue=14; cmd="L82"; finalValue=32; isZero=false; passedZero=0; belowZero=true }
       ]
   result
   |> List.sumBy _.numberZeroTouches
@@ -76,4 +76,4 @@ let B() =
   lines 1
   |> List.scan dial start
   |> List.sumBy _.numberZeroTouches
-  |> should equal 5841 //too high!
+  |> should equal 5657

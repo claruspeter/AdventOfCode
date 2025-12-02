@@ -7,14 +7,13 @@ type DialResult = {
   startingValue: int
   cmd: string
   finalValue: int
-  isZero: bool
-  negativeCrosses: int
-  positiveCrosses: int
+  isZero: bool      // finished on zero, exactly
+  passedZero: int   // in either direction
+  belowZero: bool   // hit or passed zero to the left
 }with 
   member this.numberZeroTouches =
-    (if this.isZero then 1 else 0)
-      + this.negativeCrosses
-      + this.positiveCrosses
+    (if this.belowZero then 1 else 0)
+      + this.passedZero
 
 let dial (current:DialResult) (cmd: string) =
   let direction = if cmd.[0] = 'L' then -1 else 1
@@ -22,13 +21,12 @@ let dial (current:DialResult) (cmd: string) =
   let raw = current.finalValue + direction * amount
   let capped = raw % 100
   let looped = if capped < 0 then 100 + capped else capped
-  let add1 = if current.finalValue > 0 then 1 else 0
 
   { 
     startingValue=current.finalValue
     cmd=cmd
     finalValue = looped
     isZero = looped = 0
-    negativeCrosses = if raw < 0 then  Math.Abs(raw / 100) + add1 else 0
-    positiveCrosses = if raw > 100 then (raw / 100) else 0
+    passedZero = Math.Abs(raw) / 100
+    belowZero = raw <= 0 && current.finalValue > 0
   }
