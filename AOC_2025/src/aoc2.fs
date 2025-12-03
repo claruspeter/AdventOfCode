@@ -41,6 +41,6 @@ let parse (line:string) =
     |> _.Split([|','; '-'|])
     |> Seq.map Int64.Parse
     |> Seq.chunkBySize 2
-    |> Seq.map (fun [|a; b|] -> {min=a; max=b; invalid=[]})
+    |> Seq.map (fun [|a; b;|] -> {min=a; max=b; invalid=[]})
     |> Seq.toList
   
