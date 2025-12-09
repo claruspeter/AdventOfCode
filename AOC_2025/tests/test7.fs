@@ -62,4 +62,4 @@ let B () =
     |> traceTachyons
   // result.lines |> logseqf id |> ignore
   let extra = countExtraLifetimes result
-  result.numSplit + extra |> should equal 1899 // to low
+  result.numSplit + extra |> should equal 1899 // to low (needs to be a tree/netwrok path count?)
